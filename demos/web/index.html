@@ -13,24 +13,24 @@
 <body>
     <div class="map-init" style="position: absolute; z-index: 10; bottom: 127px; right: auto; top: auto; left: 16px;">
         <div style="font-size: 11px; line-height: 18px;">
-            <div class="init-btn" id="initState" ontouchstart="return true;">
+            <div class="init-btn" id="initState">
                 <b class="icon-location">
                 </b>
             </div>
         </div>
     </div>
     <div id="zoom-btn-container" style="position: absolute; z-index: 10; bottom: 127px; right: 16px; top: auto; left: auto;">
-        <div id="zin-btn" class="zoom-btn zoom-btn-in" ontouchstart="return true;">
+        <div id="zin-btn" class="zoom-btn zoom-btn-in">
             <b class="zin icon-plus">
             </b>
         </div>
-        <div id="zout-btn" class="zoom-btn" ontouchstart="return true;">
+        <div id="zout-btn" class="zoom-btn">
             <b class="zout icon-minus">
             </b>
         </div>
     </div>
     <div style="position:absolute; top:50%;left:50%;transform:translate(-50%,-50%);">
-        <canvas id="indoormap" width="1080" height="1175">[Your browser is too old!]</canvas>
+        <canvas id="indoormap" width="1080" height="1175">This message is showing because your browser is not compatible with canvas.</canvas>
     </div>
 
     <script src="scripts/index.js"></script>
@@ -101,26 +101,10 @@
 
         var zoomScale = 1;
         if (clientWidth <= clientHeight) {
-            zoomScale = clientWidth / 720;
+            zoomScale = clientWidth / 1080;
         } else {
-            zoomScale = clientHeight / 720;
+            zoomScale = clientHeight / 1080;
         }
-
-        var zoomBtnWidth = $(".zoom-btn").width() * zoomScale;
-        var zoomBtnHeight = $(".zoom-btn").height() * zoomScale;
-        var zinFontSize = parseInt($(".zin").css('font-size').substr(0, $(".zin").css('font-size').length - 2)) * zoomScale;
-        var zoutFontSize = parseInt($(".zout").css('font-size').substr(0, $(".zout").css('font-size').length - 2)) * zoomScale;
-        var initBtnWidth = $(".init-btn").width() * zoomScale;
-        var initBtnHeight = $(".init-btn").height() * zoomScale;
-        var initFontSize = parseInt($(".map-init .init-btn b").css('font-size').substr(0, $(".map-init .init-btn b").css('font-size').length - 2)) * zoomScale;
-
-        $(".zoom-btn").width(zoomBtnWidth);
-        $(".zoom-btn").height(zoomBtnHeight);
-        $(".zin").css('font-size', zinFontSize);
-        $(".zout").css('font-size', zoutFontSize);
-        $(".init-btn").width(initBtnWidth);
-        $(".init-btn").height(initBtnHeight);
-        $(".map-init .init-btn b").css('font-size', initFontSize);
 
         $(function () {
             $("#zin-btn").click(function () {

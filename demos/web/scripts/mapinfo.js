@@ -143,7 +143,7 @@
     imageurl: '',
 },
 {
-    title: '7-ELEVEn',
+    title: '7-ELEVEN',
     x: 502,
     y: 533,
     width: 146,

@@ -77,7 +77,6 @@ This code may be freely distributed under the Apache License
         this.mdown = false; // desktop drag
 
         this.init = false;
-        this.checkRequestAnimationFrame();
         requestAnimationFrame(this.animate.bind(this));
 
         this.setEventListeners();
@@ -101,82 +100,6 @@ This code may be freely distributed under the Apache License
             // indoor map drawing function
             DrawMapInfo(this.scale.x * this.scaleAdaption, this.scale.y * this.scaleAdaption, this.position.x + this.positionAdaption.x, this.position.y + this.positionAdaption.y);
             requestAnimationFrame(this.animate.bind(this));
-        },
-
-        gesturePinchZoom: function (event) {
-            var zoom = false;
-            if (event.targetTouches.length >= 2) {
-                var p1 = event.targetTouches[0];
-                var p2 = event.targetTouches[1];
-                this.focusPointer.x = (p1.pageX + p2.pageX) / 2;
-                this.focusPointer.y = (p1.pageY + p2.pageY) / 2;
-                var zoomScale = Math.sqrt(Math.pow(p2.pageX - p1.pageX, 2) + Math.pow(p2.pageY - p1.pageY, 2)); // euclidian
-                if (this.lastZoomScale) {
-                    zoom = zoomScale - this.lastZoomScale;
-                }
-                this.lastZoomScale = zoomScale;
-            }
-            return zoom;
-        },
-
-        doZoom: function (zoom) {
-            if (!zoom)
-                return;
-            // new scale
-            var currentScale = this.scale.x;
-            var newScale = this.scale.x + zoom / 400;
-
-            if (newScale > 1) {
-                if (newScale > 2.5) {
-                    newScale = 2.5;
-                } else {
-                    newScale = this.scale.x + zoom / 400;
-                }
-            } else {
-                newScale = 1;
-            }
-            this.scale.x = newScale;
-            this.scale.y = newScale;
-
-            var deltaScale = newScale - currentScale;
-            var currentWidth = (this.canvas.width * this.scale.x);
-            var currentHeight = (this.canvas.height * this.scale.y);
-            var deltaWidth = this.canvas.width * deltaScale;
-            var deltaHeight = this.canvas.height * deltaScale;
-            var canvasmiddleX = this.focusPointer.x;
-            var canvasmiddleY = this.focusPointer.y;
-            var xonmap = (-this.position.x) + canvasmiddleX;
-            var yonmap = (-this.position.y) + canvasmiddleY;
-            var coefX = -xonmap / (currentWidth);
-            var coefY = -yonmap / (currentHeight);
-            var newPosX = this.position.x + deltaWidth * coefX;
-            var newPosY = this.position.y + deltaHeight * coefY;
-            // edges cases
-            var newWidth = currentWidth + deltaWidth;
-            var newHeight = currentHeight + deltaHeight;
-            if (newWidth < this.canvas.clientWidth)
-                return;
-            if (newPosX > 0) {
-                newPosX = 0;
-            }
-            if (newPosX + newWidth < this.canvas.clientWidth) {
-                newPosX = this.canvas.clientWidth - newWidth;
-            }
-
-            if (newHeight < this.canvas.clientHeight)
-                return;
-            if (newPosY > 0) {
-                newPosY = 0;
-            }
-            if (newPosY + newHeight < this.canvas.clientHeight) {
-                newPosY = this.canvas.clientHeight - newHeight;
-            }
-
-            // finally affectations
-            this.scale.x = newScale;
-            this.scale.y = newScale;
-            this.position.x = newPosX;
-            this.position.y = newPosY;
         },
 
         doMove: function (relativeX, relativeY) {
@@ -207,26 +130,6 @@ This code may be freely distributed under the Apache License
         },
 
         setEventListeners: function () {
-            // touch
-            this.canvas.addEventListener('touchstart', function (e) {
-                this.lastX = null;
-                this.lastY = null;
-                this.lastZoomScale = null;
-            }.bind(this));
-
-            this.canvas.addEventListener('touchmove', function (e) {
-                e.preventDefault();
-
-                if (e.targetTouches.length == 2) { // pinch
-                    this.doZoom(this.gesturePinchZoom(e));
-                } else if (e.targetTouches.length == 1) {// move
-                    var relativeX = e.targetTouches[0].pageX - this.canvas.getBoundingClientRect().left;
-                    var relativeY = e.targetTouches[0].pageY - this.canvas.getBoundingClientRect().top;
-
-                    this.doMove(relativeX, relativeY);
-                }
-            }.bind(this));
-
             if (this.desktop) {
                 // keyboard+mouse
                 window.addEventListener('keyup', function (e) {
@@ -259,34 +162,6 @@ This code may be freely distributed under the Apache License
                         this.mdown = false;
                     }
                 }.bind(this));
-            }
-        },
-
-        checkRequestAnimationFrame: function () {
-            var lastTime = 0;
-            var vendors = ['ms', 'moz', 'webkit', 'o'];
-            for (var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
-                window.requestAnimationFrame = window[vendors[x] + 'RequestAnimationFrame'];
-                window.cancelAnimationFrame = window[vendors[x] + 'CancelAnimationFrame']
-						|| window[vendors[x] + 'CancelRequestAnimationFrame'];
-            }
-
-            if (!window.requestAnimationFrame) {
-                window.requestAnimationFrame = function (callback, element) {
-                    var currTime = new Date().getTime();
-                    var timeToCall = Math.max(0, 16 - (currTime - lastTime));
-                    var id = window.setTimeout(function () {
-                        callback(currTime + timeToCall);
-                    }, timeToCall);
-                    lastTime = currTime + timeToCall;
-                    return id;
-                };
-            }
-
-            if (!window.cancelAnimationFrame) {
-                window.cancelAnimationFrame = function (id) {
-                    clearTimeout(id);
-                };
             }
         }
     };
